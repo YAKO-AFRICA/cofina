@@ -85,31 +85,28 @@
 
         <div class="card-body">
             <div class="bs-stepper-content">
-                {{-- <form method="POST" action="{{ route('prod.store')}}" enctype="multipart/form-data" class="submitForm form"> --}}
-                    <form id="productionForm" enctype="multipart/form-data" class="submitForm form">
-                        @csrf
-                    
-                        @include('productions.create.steps.stepAdherent', ['CodeProduit' => $product->CodeProduit])
+                <form id="productionForm" enctype="multipart/form-data" class="submitForm form">
+                    @csrf
+                
+                    @include('productions.create.steps.stepAdherent', ['CodeProduit' => $product->CodeProduit])
 
-                        @include('productions.create.steps.stepAssurer', ['CodeProduit' => $product->CodeProduit])
+                    @include('productions.create.steps.stepAssurer', ['CodeProduit' => $product->CodeProduit])
 
-                        @include('productions.create.steps.stepBeneficiaire', ['CodeProduit' => $product->CodeProduit])
-                    
-                        <input type="hidden" id="assuresInput" name="assures">
-                        <input type="hidden" id="beneficiariesInput" name="beneficiaires">
+                    @include('productions.create.steps.stepBeneficiaire', ['CodeProduit' => $product->CodeProduit])
+                
+                    <input type="hidden" id="assuresInput" name="assures">
+                    <input type="hidden" id="beneficiariesInput" name="beneficiaires">
 
-                        <input type="hidden" id="codeproduitvalue" name="codeproduit" value="{{ $product->CodeProduit }}">
-                    
-                        @include('productions.create.steps.stepPaiementPrime', ['CodeProduit' => $product->CodeProduit])
+                    <input type="hidden" id="codeproduitvalue" name="codeproduit" value="{{ $product->CodeProduit }}">
+                
+                    @include('productions.create.steps.stepPaiementPrime', ['CodeProduit' => $product->CodeProduit])
 
-                        @include('productions.create.steps.stepResume', ['CodeProduit' => $product->CodeProduit])
+                    @include('productions.create.steps.stepResume', ['CodeProduit' => $product->CodeProduit])
 
-                    </form>
-                    
-                    @include('productions.create.steps.stepDocument', ['CodeProduit' => $product->CodeProduit])
-                    
-                    
-                    
+                </form>
+                
+                @include('productions.create.steps.stepDocument', ['CodeProduit' => $product->CodeProduit])
+            </div>      
         </div>
     </div>
 </div>
@@ -324,30 +321,6 @@
     });
 </script>
 
-{{-- <script>
-    document.getElementById('Date_naissance').addEventListener('change', function () {
-        const ageMin = parseInt('{{ $product->AgeMiniAdh }}', 10); // Remplacez par les valeurs dynamiques de Laravel
-        const ageMax = parseInt('{{ $product->AgeMaxiAdh }}', 10); // Remplacez par les valeurs dynamiques de Laravel
-
-        const birthDate = new Date(this.value); // Récupérer la date saisie
-        const today = new Date(); // Date actuelle
-
-        // Calcul de l'âge
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-
-        // Ajuster l'âge si l'anniversaire n'est pas encore passé cette année
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-
-        // Vérifier si l'âge est hors des limites
-        if (age < ageMin || age > ageMax) {
-            alert(`L'âge doit être compris entre ${ageMin} et ${ageMax} ans.`);
-            this.value = ''; // Réinitialiser l'entrée
-        }
-    });
-</script> --}}
 
 <script>
     document.getElementById('Date_naissance').addEventListener('blur', function () {
@@ -391,15 +364,14 @@
     btn.addEventListener("click", function (event) {
         event.preventDefault();
 
+        btn.textContent = "Enregistrement en cours...";
+        btn.disabled = true;
+
         const formData = new FormData(form);
 
         axios.post('{{ route("prod.store") }}', formData)
         .then(function (response) {
             if (response.data.type === "success") {
-                // alert(response.data.message);
-
-
-                
                 if (response.data.url) {
                     window.open(response.data.url, '_blank');
                 }
@@ -412,6 +384,8 @@
             }
         })
         .catch(function (error) {
+            btn.textContent = "Enregistrer ";
+            btn.disabled = false;
             console.error(error);
             alert(error.response?.data?.message || "Une erreur est survenue.");
         });

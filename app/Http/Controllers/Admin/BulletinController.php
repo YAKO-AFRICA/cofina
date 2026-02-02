@@ -64,7 +64,7 @@ class BulletinController extends Controller
                 $options->set('isRemoteEnabled', true);
             
                 // Générer le bulletin PDF avec Dompdf
-                $pdf = Pdf::loadView('productions.components.bullettin.assurcompte', [
+                $pdf = Pdf::loadView('productions.components.bullettin.CadenceEduPlusbulletin', [
                     'contrat' => $contrat
                 ]);
             
@@ -78,27 +78,29 @@ class BulletinController extends Controller
                 $pdf->save($bulletinFileName);
             
                 // Chemin vers le fichier CGU
-                $cguFile = public_path('root/cgu/CGPLanggnant.pdf');
+                $cguFile = public_path('root/cgu/CADENCEpLUS.pdf');
             
                 // Fusionner les PDF avec FPDI
                 $finalPdf = new Fpdi();
             
-                // Ajouter les pages du bulletin
-                $finalPdf->AddPage();
-                $finalPdf->setSourceFile($bulletinFileName);
-                $tplIdx = $finalPdf->importPage(1);
-                $finalPdf->useTemplate($tplIdx);
+                // Ajouter toutes les pages du bulletin
+                $bulletinPageCount = $finalPdf->setSourceFile($bulletinFileName);
+                for ($pageNo = 1; $pageNo <= $bulletinPageCount; $pageNo++) {
+                    $finalPdf->AddPage();
+                    $tplIdx = $finalPdf->importPage($pageNo);
+                    $finalPdf->useTemplate($tplIdx);
+                }
             
                 // Ajouter toutes les pages du fichier CGU
-                $pageCount = $finalPdf->setSourceFile($cguFile);
-                for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+                $cguPageCount = $finalPdf->setSourceFile($cguFile);
+                for ($pageNo = 1; $pageNo <= $cguPageCount; $pageNo++) {
                     $finalPdf->AddPage();
                     $tplIdx = $finalPdf->importPage($pageNo);
                     $finalPdf->useTemplate($tplIdx);
                 }
             
                 // Nom final du fichier
-                $finalFileName = $bulletinDir . 'ASSURCOMPTE_' . $contrat->id . '_' . now()->format('YmdHis') . '.pdf';
+                $finalFileName = $bulletinDir . 'CADENCE_EduPlus_bulletin_' . $contrat->id . '_' . now()->format('YmdHis') . '.pdf';
             
                 // Enregistrer le PDF final
                 $finalPdf->Output($finalFileName, 'F');

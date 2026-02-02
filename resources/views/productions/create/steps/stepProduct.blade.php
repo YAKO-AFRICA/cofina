@@ -12,11 +12,7 @@
             <div class="col product-item">
                 <div class="card">
                     <div class="card-header"> 
-                        @if (Auth::user()->membre->codepartenaire == 'DIFIN')
-                            <h6 class="text-center text-capitalize">  ASSUR COMPTE DIFIN</h6>
-                        @else
-                            <h6 class="text-center text-capitalize"> {{ $product->MonLibelle ?? 'N/A' }}</h6>
-                        @endif
+                        <h6 class="text-center text-capitalize"> {{ $product->MonLibelle ?? 'N/A' }}</h6>
                     </div>
                     <div class="card-body py-1">
                         <p class="card-text">
@@ -31,9 +27,19 @@
                         </p>
                     </div>
 
+                    
+
                     <div class="card-footer text-center">
                         @can('Demarrer une souscription')
-                            <a href="{{ route('prod.create', $product->CodeProduit) }}" class="btn-prime btn-prime-two d-block">Souscrire</a>
+                             @if (in_array($product->CodeProduit, ['CAD_EDUCPLUS']))
+                                <div class="card-footer text-center">
+                                    <a href="{{ route('prod.createCAD', $product->CodeProduit) }}" class="btn-prime btn-prime-two d-block">Souscrire</a>
+                                </div>
+                            @else
+                                <div class="card-footer text-center">
+                                    <a href="#" class="btn-prime btn-prime-two d-block text-danger">Vous n'etes pas autorisé</a>
+                                </div>
+                            @endif
                         @else
                             <a href="#" class="btn-prime btn-prime-two d-block">Vous n'etres pas autoriser</a>
                         @endcan
@@ -46,6 +52,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            sessionStorage.removeItem('simulationData');
             var searchInput = document.getElementById('searchProduct');
             var productItems = document.querySelectorAll('.product-item');
 

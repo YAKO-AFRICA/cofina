@@ -16,7 +16,7 @@
         </div>
 
 
-        @if ($CodeProduit != "ASSCPTBNI" && Auth::user()->codepartenaire == "DIFIN")
+        @if ($CodeProduit == "CAD_EDUCPLUS" && Auth::user()->codepartenaire == "COFINA")
         <div class="col-12 col-lg-6 d-flex justify-content-center align-items-center">
             <!-- Button trigger modal -->
             <button type="button" class="btn" data-bs-toggle="modal"
@@ -61,14 +61,6 @@
     
     
     <div class="row g-3 float-end">
-        {{-- <div class="col-12">
-            <div class="d-flex align-items-center gap-3">
-                <button onclick="event.preventDefault(); stepper1.previous()" class="btn border-btn px-4 btn-previous-form"><i
-                        class='bx bx-left-arrow-alt me-2'></i>Precedent</button>
-                <button onclick="event.preventDefault(); stepper1.next()" class="btn btn-two px-4 btn-next-form">Suivant<i
-                        class='bx bx-right-arrow-alt ms-2'></i></button>
-            </div>
-        </div> --}}
 
         <div class="d-flex justify-content-between">
             <div class="">

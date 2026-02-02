@@ -26,6 +26,7 @@ use App\Models\ReseauProduct;
 use App\Models\TblProfession;
 use App\Models\AgenceByParter;
 use App\Models\AssureGarantie;
+use App\Models\ProductFormule;
 use App\Models\ProduitGarantie;
 use App\Models\TblSecteurActivite;
 use Illuminate\Support\Facades\DB;
@@ -215,9 +216,11 @@ class ProductionController extends Controller
     public function stepProduct()
     {
 
-        $productByReseau = ReseauProduct::select('CodeProduit')
-            ->where('codereseau', Auth::user()->membre->codereseau)
-            ->get();
+        // $productByReseau = ReseauProduct::select('CodeProduit')
+        //     ->where('codereseau', Auth::user()->membre->codereseau)
+        //     ->get();
+        $productByReseau = ProductFormule::select('CodeProduit')
+            ->where('CodeContractant', 'cofina')->get();
 
         
         $codeProduits = $productByReseau->pluck('CodeProduit')->toArray();
@@ -232,6 +235,14 @@ class ProductionController extends Controller
 
         // dd($products);
         return view('productions.create.steps.stepProduct', compact('products'));
+    }
+
+     public function createCAD($codeProduit)
+    {
+        $product = Product::where('CodeProduit', $codeProduit)->first();
+        $productGarantie = ProduitGarantie::where(['codeproduit' => $codeProduit])->get();
+
+        return view('productions.create.simulateur.cadESimulateur', compact('product', 'productGarantie'));
     }
 
     public function addAssureToSession(Request $request)
@@ -282,14 +293,21 @@ class ProductionController extends Controller
         DB::beginTransaction();
         try {
 
-            $racine = "6501100011116";
+            if($request->codeproduit == "CAD_EDUCPLUS"){
+                $prefix = '679710069100117';
+            } else {
+                $prefix = '679710069100117';
+            }
 
+            $increment = Contrat::where('numBullettin', 'like', $prefix . '%')
+            ->where('codeproduit', $request->codeproduit)->count() + 1;
 
-            // Trouver le dernier bulletin pour incrémenter
-            // $dernierBulletin = Contrat::where('codeproduit', "ASSCPTBNI")->orderBy('numBullettin', 'desc')->first();
-            // $numGenerer = $dernierBulletin ? ((int)substr($dernierBulletin->numBullettin, strlen($racine))) + 1 : 1;
+            do {
+                $numBullettin = $prefix . $increment;
+                $numExist = Contrat::where('numBullettin', $numBullettin)->exists();
+                $increment++;
+            } while ($numExist);
 
-            $numeroBulletin = RefgenerateBulletin(Contrat::class,'ASSCPTBNI', 'numBullettin', '68780100010177');
     
             // Construire le numéro de bulletin unique
             // $numeroBulletin = $racine . $numGenerer;
@@ -474,8 +492,6 @@ class ProductionController extends Controller
                     'codeConseiller' => $request->codeConseiller,
                     'nomagent' => $request->conseiller,
 
-                    // 'prime' => $request->prime,
-
                     'primepricipale' => number_format($request->primepricipale, 2, ".", ""),
                     'prime' => $prime,
                     'fraisadhesion' => $request->fraisadhesion,
@@ -488,12 +504,12 @@ class ProductionController extends Controller
                     'saisiele' => now(),
                     'saisiepar' => Auth::user()->membre->idmembre,
                     
-                    'duree' => $request->duree,
+                    'duree' => 10,
                     
                     'codeadherent' => $idAdherent,
                     'estMigre' => 0,
                     'codeproduit' => $request->codeproduit,
-                    'numBullettin' => $numeroBulletin,
+                    'numBullettin' => $numBullettin,
 
                     // 'transmisle' => now(),
                     // 'annulerle' => null,
@@ -501,8 +517,7 @@ class ProductionController extends Controller
                     // 'modifierle' => null,
                     // 'modifierpar' => null,
                     // 'motifrejet' => null,
-                    // 'libelleproduit' => $product->MonLibelle,
-                    'libelleproduit' => "ASSUR COMPTE DIFIN",
+                    'libelleproduit' => $product->MonLibelle,
                     // 'montantrente' => $request->montantrente,
                     // 'periodiciterente' => $request->periodiciterente,
                     // 'dureerente' => $request->dureerente,
@@ -521,20 +536,20 @@ class ProductionController extends Controller
                     'rib' => $request->rib,
                     // 'idproposition' => now(),
                     // 'codeproposition' => now(),
-                    'branche' => Auth::user()->membre->branche,
+                    'branche' => "BANKASS",
                     
-                    'partenaire' => Auth::user()->membre->codepartenaire,
+                    'partenaire' => "COFINA",
                     // 'nomaccepterpar' => now(),
                     // 'refcontratsource' => now(),
-                    'cleintegration' => "12012025",
+                    // 'cleintegration' => now(),
                     // 'codeoperation' => now(),
                     // 'numeropolice' => now(),
                     
                     'estpaye' => 0,
                     // 'pretconnexe' => now(),
                     // 'details' => now(),
-                    'nomsouscipteur' => $idAdherent,
-                    'typesouscipteur' => Auth::user()->membre->branche,
+                    'nomsouscipteur' => $request->nom . ' ' . $request->prenom,
+                    'typesouscipteur' => "BANKASS",
                 ])->save();
 
 
@@ -574,57 +589,77 @@ class ProductionController extends Controller
             // Récupérer les données nécessaires au bulletin
             $contrat = Contrat::findOrFail($idContrat);
 
+            log::info("Génération du bulletin pour le contrat ID: $idContrat");
+            log::info("Détails du contrat: ", ['contrat' => $contrat->toArray()]);
+
             // Options pour DomPDF
             $options = new Options();
             $options->set('isRemoteEnabled', true);
+            $options->set('isHtml5ParserEnabled', true);
+
+            log::info("uctions.components.bullettin.CadenceEduPlusbulle");
+
 
             // Génération du bulletin PDF temporaire
-            $pdf = PDF::loadView('productions.components.bullettin.assurcompte', [
+            $pdf = PDF::loadView('productions.components.bullettin.CadenceEduPlusbulletin', [
                 'contrat' => $contrat,
             ]);
+
+            Log::info("Bulletin PDF temporaire généré pour le contrat ID");
 
             $bulletinDir = public_path('documents/bulletin/');
             if (!is_dir($bulletinDir)) {
                 mkdir($bulletinDir, 0777, true);
             }
 
+            Log::info("Répertoire de bulletin créé : $bulletinDir");
+
             $tempBulletinPath = $bulletinDir . 'temp_bulletin_' . $contrat->id . '.pdf';
             $pdf->save($tempBulletinPath);
 
             // Chemin vers le fichier CGU
-            $cguFilePath = public_path('root/cgu/CGPLanggnant.pdf');
+            $cguFilePath = public_path('root/cgu/CADENCEpLUS.pdf');
 
             // Initialiser FPDI pour fusionner les fichiers
             $finalPdf = new Fpdi();
 
-            // Ajouter le bulletin au PDF final
-            $finalPdf->AddPage();
-            $finalPdf->setSourceFile($tempBulletinPath);
-            $bulletinTplIdx = $finalPdf->importPage(1);
-            $finalPdf->useTemplate($bulletinTplIdx);
+            Log::info("Répertoire finalPdf ");
 
-            // Ajouter les pages du fichier CGU
+            // Ajouter toutes les pages du bulletin
+            $bulletinPageCount = $finalPdf->setSourceFile($tempBulletinPath);
+            for ($pageNo = 1; $pageNo <= $bulletinPageCount; $pageNo++) {
+                $finalPdf->AddPage();
+                $tplIdx = $finalPdf->importPage($pageNo);
+                $finalPdf->useTemplate($tplIdx);
+            }
+
+            
+        
+            // Ajouter toutes les pages du fichier CGU
             $cguPageCount = $finalPdf->setSourceFile($cguFilePath);
             for ($pageNo = 1; $pageNo <= $cguPageCount; $pageNo++) {
                 $finalPdf->AddPage();
-                $cguTplIdx = $finalPdf->importPage($pageNo);
-                $finalPdf->useTemplate($cguTplIdx);
+                $tplIdx = $finalPdf->importPage($pageNo);
+                $finalPdf->useTemplate($tplIdx);
             }
 
+            Log::info("cguPageCount  ");
+
             // Nom final du fichier fusionné
-            $finalBulletinPath = $bulletinDir . 'assurcompte_' . $contrat->id.'_'.date('YmdHis') . '.pdf';
+            $finalBulletinPath = $bulletinDir . 'cadence_edu_plus_' . $contrat->id.'_'.date('YmdHis') . '.pdf';
             $finalPdf->Output($finalBulletinPath, 'F');
 
             // Supprimer le fichier temporaire du bulletin
             unlink($tempBulletinPath);
+            
 
             // Définir l'URL publique pour le fichier final
-            $fileUrl = asset("documents/bulletin/assurcompte_{$contrat->id}_".date('YmdHis') . ".pdf");
+            $fileUrl = asset("documents/bulletin/cadence_edu_plus_{$contrat->id}_".date('YmdHis') . ".pdf");
 
             return [
                 'success' => true,
                 'file_url' => $fileUrl,
-                'redirect_url' => route('prod.edit', ['id' => $idContrat]),
+                'redirect_url' => route('prod.show', ['id' => $idContrat]),
             ];
         } catch (\Exception $e) {
             Log::error("Erreur lors de la génération du bulletin : ", ['error' => $e]);
@@ -734,16 +769,16 @@ class ProductionController extends Controller
                 'rib' => $request->rib,
                 'periodicite' => $request->periodicite,
 
-                'primepricipale' => $request->primepricipale,
-                'prime' => $request->primepricipale + $request->fraisadhesion,
+                // 'primepricipale' => $request->primepricipale,
+                // 'prime' => $request->primepricipale + $request->fraisadhesion,
 
-                'fraisadhesion' => $request->fraisadhesion,
+                // 'fraisadhesion' => $request->fraisadhesion,
 
                 // 'surprime' => $request->surprime,
                 
-                'capital' => number_format($request->capital, 2, ".", ""),
+                // 'capital' => number_format($request->capital, 2, ".", ""),
                 
-                'duree' => $request->duree,
+                // 'duree' => $request->duree,
                 
                 // 'codeproduit' => $request->codeproduit,
 
@@ -831,26 +866,3 @@ class ProductionController extends Controller
         }
     }
 }
-
-
-// $files = $request->file('files');
-//                 $libelles = $request->input('libelles');  // Récupérer les libellés
-
-                
-//                 foreach ($files as $key => $file) {
-//                     $imageName = Str::uuid() . '.' . $file->getClientOriginalExtension();
-//                     $destinationPath = public_path('documents/files');
-//                     $file->move($destinationPath, $imageName);
-//                     $filePath = 'documents/files/' . $imageName;
-
-//                     // \dd($libelles[$key]);
-
-//                     Document::create([
-//                         'codecontrat' => $idContrat,
-//                         'filename' => $imageName,
-//                         'libelle' => $libelles[$key],
-//                         'saisiele' => now(),
-//                         'saisiepar' => Auth::user()->membre->idmembre,
-//                         'source' => "ES",
-//                     ])->save();
-//                 }

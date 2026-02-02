@@ -169,27 +169,27 @@ class DocumentController extends Controller
     public function destroy(string $id)
     {
         try {
-        DB::beginTransaction();
+            DB::beginTransaction();
 
-        TblDocument::find($id)->delete();
+            TblDocument::find($id)->delete();
 
-        DB::commit();
-    
-        return response()->json([
-            'type' => 'success',
-            'urlback' => 'back',
-            'message' => "Supprimé avec succès!",
-            'code' => 200,
-        ]);
-    } catch (\Throwable $th) {
-        DB::rollBack();
-        return response()->json([
-            'type' => 'error',
-            'urlback' => 'back',
-            'message' => "Erreur système! $th",
-            'code' => 500,
-        ]);
-    }
+            DB::commit();
+        
+            return response()->json([
+                'type' => 'success',
+                'urlback' => 'back',
+                'message' => "Supprimé avec succès!",
+                'code' => 200,
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'type' => 'error',
+                'urlback' => 'back',
+                'message' => "Erreur système! $th",
+                'code' => 500,
+            ]);
+        }
     }
 
 

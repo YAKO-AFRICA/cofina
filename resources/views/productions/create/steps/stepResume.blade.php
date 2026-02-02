@@ -72,7 +72,7 @@
                         <div class="col-6  col-xs-12 border-r">
                             <dl class="row">
                                 <dt class="col-xs-12 col-sm-6 col-md-6 col-lg-6">Produit:</dt>
-                                <dd class="col-xs-12 col-sm-6 col-md-6 col-lg-6">ASSUR COMPTE DIFIN</dd>
+                                <dd class="col-xs-12 col-sm-6 col-md-6 col-lg-6">Cadence Education Plus COFINA</dd>
 
                                 <dt class="col-xs-12 col-sm-6 col-md-6 col-lg-6">Date Effet:</dt>
                                 <dd class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="displayDateEffet">-</dd>
@@ -99,7 +99,7 @@
                                 <dd class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="displayDureePay">-</dd>
 
                                 <dt class="col-xs-12 col-sm-6 col-md-6 col-lg-6">Organisme payeur:</dt>
-                                <dd class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="displayOrganisme">DIFIN</dd>
+                                <dd class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="displayOrganisme">COFINA</dd>
 
                                 <dt class="col-xs-12 col-sm-6 col-md-6 col-lg-6">Agence:</dt>
                                 <dd class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="displayAgence">-</dd>

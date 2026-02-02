@@ -290,6 +290,7 @@ Route::prefix('production')->name('prod.')->group(function(){
         Route::post('/update/{id}', [ProductionController::class, 'update'])->name('contrat.update');
         Route::get('/create/stepProduct', [ProductionController::class, 'stepProduct'])->name('stepProduct');
         Route::get('/create/add/{codeproduit}', [ProductionController::class, 'create'])->name('create');
+        Route::get('/createCAD/add/{codeproduit}', [ProductionController::class, 'createCAD'])->name('createCAD');
         Route::post('/store', [ProductionController::class, 'store'])->name('store');
         Route::post('/destroy/{id}', [ProductionController::class, 'destroy'])->name('destroy');
         Route::post('/upload-documents', [ProductionController::class, 'upload'])->name('upload.documents');

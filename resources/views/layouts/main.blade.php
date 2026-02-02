@@ -113,7 +113,11 @@
         <script src="{{ asset('assets/plugins/bs-stepper/js/bs-stepper.min.js')}}"></script>
         <script src="{{ asset('assets/plugins/bs-stepper/js/main.js')}}"></script>
 
-        <script src="{{ asset('assets/root/resume.js')}}"></script>
+        {{-- <script src="{{ asset('assets/root/resume.js')}}"></script> --}}
+        <script src="{{ asset('root/resume.js')}}"></script>
+
+        <script src="{{ asset('assets/root/simulateur/simulateurCADE.js')}}"></script>
+         <script src="{{ asset('assets/js/fieldsForm.js')}}"></script>
         
        
         <!--app JS-->
@@ -156,6 +160,7 @@
         <script src="{{ asset('assets/js/script.js')}}"></script>
         <script src="{{ asset('assets/js/app.js')}}"></script>
         <script src="{{ asset('assets/js/main.js')}}"></script>
+        
 
         
         

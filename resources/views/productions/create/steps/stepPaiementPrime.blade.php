@@ -44,7 +44,7 @@
                     <div class="row mb-3" id="mode_bancaire">
                         <div class="col-12 mb-3">
                             <label for="banque" class="form-label">Ma banque ou organisme de prélèvement</label>
-                            <input type="text" class="form-control" id="banque" name="organisme" value="DIFIN" readonly>
+                            <input type="text" class="form-control" id="banque" name="organisme" value="COFINA" readonly>
                         </div>
                         <div class="row">
                             <div class="col-6 mb-3">

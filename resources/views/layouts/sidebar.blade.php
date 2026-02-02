@@ -33,7 +33,7 @@
         </div>
 
         <div class="overflow-auto " style="height: calc(100vh - 180px)">
-            {{-- @can('Voir e-souscription')
+            @can('Voir e-souscription')
                 <strong><li class="menu-label">E-Souscription</li></strong>
 
                 @can('Demarrer une souscription')
@@ -54,7 +54,7 @@
                         <div class="menu-title">Mes Propositions</div>
                     </a>
                 </li>
-                @can('Chef equipe')
+                {{-- @can('Chef equipe')
                     <li>
                         <a href="{{ route('prod.indexByAgence')}}">
                             <div class="parent-icon"><i class="fadeIn animated bx bx-git-merge"></i>
@@ -62,9 +62,9 @@
                             <div class="menu-title">Propositions/agences</div>
                         </a>
                     </li>
-                @endcan
+                @endcan --}}
             
-            @endcan --}}
+            @endcan
 
             {{-- @can('Voir e-pret') --}}
                 <li class="menu-label ">E-Prêt</li>
